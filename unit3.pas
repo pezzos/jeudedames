@@ -47,7 +47,7 @@ type
 var
   Form3: TForm3;
   CaseDepartSelectionnee :boolean;
-  Plateau: array[0..9,0..9] of TPion;
+  Plateau: array[0..9,0..10] of TPion;
   PionsMangesJ1,PionsMangesJ2,CaseDepartCol,CaseDepartRow,CaseArriveeCol,CaseArriveeRow,Tour:integer;
   //Nombretour:integer;
 implementation
