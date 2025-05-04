@@ -6,6 +6,7 @@ This file tracks suggested improvements and necessary implementations for the De
 
 1.  **Refactor Move Handling and Execution:**
     *   **Problem:** Move selection, validation, and execution logic is currently split between `StringGrid1Click`, `ButtonOnClick`, and several unimplemented helper procedures (`ValiderDeplacement`, `VerifierCapture`, etc.). `ButtonOnClick` seems disconnected or redundant.
+    *   **Failure Point:** The "Confirmer" button (linked to `ButtonOnClick`) **does not work** because the procedures it calls (`ValiderDeplacement`, `VerifierCapture`, etc.) are unimplemented placeholders. They do not modify the `Plateau` state. Any move *appearing* to happen occurs due to partial logic placed directly in `StringGrid1Click` for immediate feedback, which bypasses the button and lacks full rule implementation.
     *   **Task:** Consolidate all move-related logic. `StringGrid1Click` should handle only the selection of start (first click) and destination (second click) squares. Upon the second valid click (empty black square), it should call a single, comprehensive procedure (e.g., `ExecuterOuTenterDeplacement`). This new procedure will be responsible for:
         *   Performing full move validation (diagonal checks, distance, direction, pawn vs. king rules).
         *   Handling captures (detecting jumps, removing captured pieces, updating scores).
@@ -34,6 +35,7 @@ This file tracks suggested improvements and necessary implementations for the De
     *   **Task:** Choose *one* indexing convention and apply it consistently everywhere:
         *   **Recommended:** Modify all `Plateau` access logic (initialization, `StringGrid1Click`, `StringGrid1DrawCell`, move execution) to use **0-based indexing** (0 to 9). This aligns directly with `StringGrid` coordinates.
         *   **Alternative:** Change `Plateau` declaration to `array[1..10, 1..10]` and ensure all grid coordinates are adjusted (`+1`) before accessing `Plateau`.
+    *   **Verification:** Double-check the initial pawn placement loops in `FormCreate`. User reported a potential missing black pawn (J2) in the last row (index `i=9`). Verify that the combination of loop bounds (`i := 6 to 9`, `j := 0 to 9`), the black square condition (`(i + j) mod 2 = 1`), and the array access (`Plateau[i + 1, j + 1] := J2`) correctly initializes all 20 J2 pawns in the `Plateau` array.
 
 4.  **Improve Game State Management:**
     *   **Problem:** Game state (`Plateau`, `Tour`, `PionsMangesJ1`, `PionsMangesJ2`, `CaseDepartSelectionnee`, etc.) relies on global variables, making the code harder to manage and test.
@@ -45,14 +47,23 @@ This file tracks suggested improvements and necessary implementations for the De
     *   **Problem:** Kings (`D1`, `D2`) are currently drawn identically to pawns (`J1`, `J2`) in `DessinerPion`.
     *   **Task:** Modify `DessinerPion` (or create a new `DessinerRoi` procedure) to draw Kings differently. Add a visual indicator (e.g., a concentric inner circle, a thicker border, a small 'K' or crown symbol). Update `StringGrid1DrawCell` to call the correct drawing procedure based on whether the `PieceType` is `J1`/`J2` or `D1`/`D2`.
 
-6.  **Enhance UI Feedback:**
+6.  **Highlight Possible Moves:**
+    *   **Feature Request:** When a player selects a piece (first click), instead of waiting for the second click, the UI should immediately highlight all valid destination squares for that piece.
+    *   **Task:** Implement logic within `StringGrid1Click` (after a valid start piece is selected): 
+        *   Calculate all legal moves (simple steps and captures) for the selected piece (`CaseDepartCol`, `CaseDepartRow`) based on its type (pawn/king) and the board state (`Plateau`). This requires rule logic from TODO #2.
+        *   Store the list of valid destination coordinates (e.g., in a dynamic array or list).
+        *   Trigger a grid repaint (`StringGrid1.Invalidate`).
+        *   Modify `StringGrid1DrawCell` or `SurlignerCase` to draw a distinct highlight (e.g., a different color like `clYellow` or a semi-transparent overlay) on the cells corresponding to these valid destination coordinates.
+        *   Ensure these highlights are cleared when the starting piece is deselected (e.g., clicking the same piece again, clicking another valid starting piece) or after a move is completed.
+
+7.  **Enhance UI Feedback:**
     *   **Problem:** `ShowMessage` is used for debugging info and error messages, which interrupts gameplay.
     *   **Task:** Replace all `ShowMessage` calls related to game flow and validation with less intrusive methods. Use a `TStatusBar` component added to `Form3` to display status messages (e.g., "Invalid move: destination occupied", "Player 2's turn"). Alternatively, use a dedicated `TLabel`. Ensure highlighting (`SurlignerCase`) is clear and consistently applied/removed.
 
-7.  **Remove Unused UI Components:**
+8.  **Remove Unused UI Components:**
     *   **Problem:** `RadioButton1`, `RadioButton2`, and potentially `LabeledEdit4` appear to be unused in the form's current logic.
     *   **Task:** Remove these components from `Form3` using the Lazarus Form Designer (or by manually editing `Unit3.pas` and `Unit3.lfm`) to clean up the interface and code.
 
-8.  **Clarify or Remove Button1:**
+9.  **Clarify or Remove Button1:**
     *   **Problem:** The purpose and connection of `Button1` and its `ButtonOnClick` handler are unclear, especially if move execution happens directly in `StringGrid1Click`.
     *   **Task:** Decide on the role of `Button1`. If moves are executed immediately on the second grid click (as recommended in Task 1), remove `Button1` and its `ButtonOnClick` handler entirely. If it serves another purpose (e.g., "Offer Draw", "Resign"), rename the button and handler appropriately and implement that functionality. Ensure the handler name (`ButtonOnClick`) matches the component's `OnClick` event assignment in the Object Inspector if kept. 
