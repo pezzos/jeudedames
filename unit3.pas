@@ -91,6 +91,8 @@ for i := 0 to 9 do
          Plateau[i + 1, j + 1] := J2;
         end;
 
+  // Force placement of pawn at 1-based [9, 10] as a workaround
+  Plateau[9, 10] := J2;
 
   // Initialisation des variables
   Tour := 1;
