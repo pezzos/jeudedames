@@ -42,6 +42,7 @@ type
     procedure VerifierCapture(DepartCol,DepartRow,ArriveeCol,ArriveeRow:integer);
     procedure VerifierPromotion(ArriveeCol,ArriveeRow:integer);
     procedure FinDuTour;
+    procedure VerifierFinPartie;
   end;
 
 var
@@ -113,13 +114,13 @@ procedure TForm3.ButtonOnClick(Sender: TObject);
   // Vérifier que les cases de départ et d'arrivée ont été sélectionnées
   if (CaseDepartCol = 0) or (CaseDepartRow = 0) or (CaseArriveeCol = 0) or (CaseArriveeRow = 0) then
   begin
-    ShowMessage('Veuillez sélectionner une case de départ et une case d''arrivée.');
+    StatusBar1.SimpleText := 'Veuillez sélectionner une case de départ et une case d''arrivée.';
     Exit;
   end;
    
   // Afficher les coordonnées pour débogage
-  ShowMessage('Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
-              ' à Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow));
+  StatusBar1.SimpleText := 'Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
+              ' à Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow);
 
   // Valider le déplacement
   ValiderDeplacement(CaseDepartCol, CaseDepartRow, CaseArriveeCol, CaseArriveeRow);
@@ -142,97 +143,246 @@ procedure TForm3.ButtonOnClick(Sender: TObject);
   end;
 
 procedure TForm3.StringGrid1Click(Sender: TObject);
+var
+  ClickedCol, ClickedRow: Integer;
+  PieceType: TPion;
 begin
-  
-if not CaseDepartSelectionnee then
+  // Get clicked cell coordinates
+  ClickedCol := StringGrid1.Col;
+  ClickedRow := StringGrid1.Row;
+
+  // Debug: Check if the button click is still needed - it shouldn't be
+  // if Button1.Visible then
+  // begin
+  //   ShowMessage('Veuillez d''abord cliquer sur Valider.');
+  //   Exit;
+  // end;
+
+  if (ClickedCol = 0) or (ClickedRow = 0) then // Ignore clicks on headers
+    Exit;
+
+  // Check if a start square is already selected
+  if not CaseDepartSelectionnee then
   begin
-    // Récupérer les coordonnées de la case départ
-    CaseDepartCol := StringGrid1.Col + 1;
-    CaseDepartRow := StringGrid1.Row + 1;
+    // First click: Selecting the start square
+    // Debugging: Display selected start square
+    // ShowMessage('Case départ sélectionnée : Col=' + IntToStr(ClickedCol) + ', Row=' + IntToStr(ClickedRow));
 
-    // Afficher les coordonnées pour débogage
-    ShowMessage('Case départ : Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow));
-
-    // Vérifier si la case est noire
-    if (CaseDepartRow + CaseDepartCol) mod 2 = 0 then
+    // Check if the clicked square is valid (black and contains current player's piece)
+    if ((ClickedRow + ClickedCol) mod 2 <> 0) then // Black square check
     begin
-      ShowMessage('Vous ne pouvez cliquer que sur les cases noires.');
-      Exit;
+        PieceType := Plateau[ClickedRow, ClickedCol]; // Read from logical board
+        // Check if the piece belongs to the current player based on Tour
+        if ((Tour mod 2 <> 0) and (PieceType in [J1, D1])) or ((Tour mod 2 = 0) and (PieceType in [J2, D2])) then
+        begin
+            CaseDepartCol := ClickedCol;
+            CaseDepartRow := ClickedRow;
+            CaseDepartSelectionnee := True;
+            // Highlight the selected square (optional, can be done in DrawCell)
+            StringGrid1.InvalidateCell(CaseDepartCol, CaseDepartRow); // Force redraw for selection feedback
+             StatusBar1.SimpleText := 'Case départ : Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow);
+        end
+        else
+        begin
+            // Invalid selection: wrong player's piece or empty square
+             StatusBar1.SimpleText := 'La case de départ doit contenir un pion du joueur actuel.';
+            Exit;
+        end;
+    end
+    else
+    begin
+        // Invalid selection: white square
+         StatusBar1.SimpleText := 'Vous ne pouvez cliquer que sur les cases noires.';
+        Exit;
     end;
 
-    // Vérifier si la case contient un pion du joueur actuel
-    if (Plateau[CaseDepartRow, CaseDepartCol] <> J1) and (Plateau[CaseDepartRow, CaseDepartCol] <> J2) then
-    begin
-      ShowMessage('La case de départ doit contenir un pion du joueur actuel.');
-      Exit;
-    end;
-
-    // Surligner la case départ
-    SurlignerCase(CaseDepartCol - 1, CaseDepartRow - 1, clBlue);
-
-    // Marquer la case de départ comme sélectionnée
-    CaseDepartSelectionnee := True;
   end
   else
   begin
-    // Récupérer les coordonnées de la case arrivée
-    CaseArriveeCol := StringGrid1.Col + 1;
-    CaseArriveeRow := StringGrid1.Row + 1;
+    // Second click: Selecting the destination square
+    // Debugging: Display selected arrival square
+    // ShowMessage('Case arrivée sélectionnée : Col=' + IntToStr(ClickedCol) + ', Row=' + IntToStr(ClickedRow));
 
-    // Afficher les coordonnées pour débogage
-    ShowMessage('Case arrivée : Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow));
+    CaseArriveeCol := ClickedCol;
+    CaseArriveeRow := ClickedRow;
 
-    // Vérifier si la case est noire
-    if (CaseArriveeRow + CaseArriveeCol) mod 2 = 0 then
+    // Check if the destination square is valid (black)
+    if ((CaseArriveeRow + CaseArriveeCol) mod 2 <> 0) then
     begin
-      ShowMessage('Vous ne pouvez cliquer que sur les cases noires.');
-      Exit;
-    end;
+        // Get the type of the piece being moved
+        PieceType := Plateau[CaseDepartRow, CaseDepartCol];
 
-    // Vérifier si la case d'arrivée est vide
-    if (Plateau[CaseArriveeRow, CaseArriveeCol] <> Vide) then
-    begin
-      // Si la case contient un pion du joueur actuel, elle devient la nouvelle case de départ
-      if (Plateau[CaseArriveeRow, CaseArriveeCol] = J1) or (Plateau[CaseArriveeRow, CaseArriveeCol] = J2) then
-      begin
-        CaseDepartCol := CaseArriveeCol;
-        CaseDepartRow := CaseArriveeRow;
-        SurlignerCase(CaseDepartCol - 1, CaseDepartRow - 1, clBlue);
-        ShowMessage('La case d''arrivée contient un pion du joueur actuel. Choisissez une nouvelle case d''arrivée.');
-        Exit;
-      end
-      else
-      begin
-        ShowMessage('La case d''arrivée doit être vide.');
-        Exit;
-      end;
-    end;
+        // --- Validation Logic ---
+        // 1. Is the destination square empty?
+        if Plateau[CaseArriveeRow, CaseArriveeCol] = Vide then
+        begin
+            // 2. Is the move diagonal by one step? (Pawn Move)
+            if (Abs(CaseArriveeCol - CaseDepartCol) = 1) and (Abs(CaseArriveeRow - CaseDepartRow) = 1) then
+            begin
+                // 3. Is the move direction correct for the pawn?
+                if (PieceType = J1) and (CaseArriveeRow < CaseDepartRow) then
+                begin
+                     StatusBar1.SimpleText := 'Les pions blancs (J1) doivent se déplacer en descendant.';
+                    Exit; // Invalid move
+                end;
+                if (PieceType = J2) and (CaseArriveeRow > CaseDepartRow) then
+                begin
+                     StatusBar1.SimpleText := 'Les pions noirs (J2) doivent se déplacer en montant.';
+                    Exit; // Invalid move
+                end;
 
-    // Vérifier le déplacement diagonal
-    if Abs(CaseArriveeCol - CaseDepartCol) <> Abs(CaseArriveeRow - CaseDepartRow) then
-    begin
-      ShowMessage('Le déplacement doit être diagonal.');
-      Exit;
-    end;
+                // --- Valid Pawn Move ---
+                 StatusBar1.SimpleText := 'Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
+                                       ' vers Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow);
+                // Update logical board
+                Plateau[CaseArriveeRow, CaseArriveeCol] := PieceType;
+                Plateau[CaseDepartRow, CaseDepartCol] := Vide;
 
-    // Vérifier le sens du déplacement (descendant pour les blancs, montant pour les noirs)
-    if (Plateau[CaseDepartRow, CaseDepartCol] = J1) and (CaseArriveeRow <= CaseDepartRow) then
-    begin
-      ShowMessage('Les pions blancs doivent se déplacer en descendant.');
-      Exit;
+                // End Turn Logic
+                Tour := Tour + 1;
+                LabeledEdit1.Text := IntToStr(Tour);
+                CaseDepartSelectionnee := False;
+                // Reset variables for next turn
+                CaseDepartCol := 0; CaseDepartRow := 0; CaseArriveeCol := 0; CaseArriveeRow := 0;
+                // Redraw the entire grid
+                StringGrid1.Invalidate;
+            end
+            else
+            begin
+                // --- Not a simple pawn move, check other possibilities (capture, king move?) ---
+                // For now, just consider it invalid if not a single diagonal step
+                 StatusBar1.SimpleText := 'Mouvement non valide (pour l'instant).'; // Placeholder message
+                // Keep selection active to allow choosing a different destination
+                CaseArriveeCol := 0; CaseArriveeRow := 0;
+                 Exit;
+            end;
+        end
+        else
+        begin
+             // Destination square is not empty
+             StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
+             // Allow user to select a different destination
+             CaseArriveeCol := 0; CaseArriveeRow := 0;
+             Exit;
+        end;
     end
-    else if (Plateau[CaseDepartRow, CaseDepartCol] = J2) and (CaseArriveeRow >= CaseDepartRow) then
+    else
     begin
-      ShowMessage('Les pions noirs doivent se déplacer en montant.');
-      Exit;
+        // Invalid destination: white square
+         StatusBar1.SimpleText := 'Vous ne pouvez cliquer que sur les cases noires pour la destination.';
+        // Allow user to select a different destination
+        CaseArriveeCol := 0; CaseArriveeRow := 0;
+        Exit;
     end;
-
-    // Surligner la case arrivée
-    SurlignerCase(CaseArriveeCol - 1, CaseArriveeRow - 1, clBlue);
-
-    // Réinitialiser la sélection de la case de départ
-    CaseDepartSelectionnee := False;
   end;
+end;
+
+
+// --- Obsolete Button Handler ---
+procedure TForm3.Button1Click(Sender: TObject);
+begin
+ // This handler is no longer needed as moves happen directly on the second click.
+ // We keep it here temporarily but will remove it (Task 1).
+ // if (CaseDepartRow = 0) or (CaseDepartCol = 0) or (CaseArriveeRow = 0) or (CaseArriveeCol = 0) then
+ // begin
+ //   ShowMessage('Veuillez sélectionner une case de départ et une case d''arrivée.');
+ //   Exit;
+ // end;
+
+ // ShowMessage('Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
+ //   ' vers Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow) + ' (Validation via bouton)');
+
+ // Call the old validation logic (to be replaced/integrated into StringGrid1Click)
+ // if ValiderDeplacement(CaseDepartCol, CaseDepartRow, CaseArriveeCol, CaseArriveeRow) then
+ // begin
+ //   // Move the piece on the logical board
+ //   Plateau[CaseArriveeRow, CaseArriveeCol] := Plateau[CaseDepartRow, CaseDepartCol];
+ //   Plateau[CaseDepartRow, CaseDepartCol] := Vide;
+
+ //   // Check and handle capture (to be integrated/refined)
+ //   // VerifierCapture(CaseDepartCol, CaseDepartRow, CaseArriveeCol, CaseArriveeRow);
+
+ //   // Check and handle promotion (to be integrated/refined)
+ //   // VerifierPromotion(CaseArriveeCol, CaseArriveeRow);
+
+ //   // End Turn
+ //   Tour := Tour + 1;
+ //   LabeledEdit1.Text := IntToStr(Tour);
+
+ //   // Reset selection for next turn
+ //   CaseDepartSelectionnee := False;
+ //   CaseDepartCol := 0;
+ //   CaseDepartRow := 0;
+ //   CaseArriveeCol := 0;
+ //   CaseArriveeRow := 0;
+
+ //   // Redraw the grid
+ //   StringGrid1.Invalidate;
+ // end;
+ // // No else needed here, ValiderDeplacement already showed messages
+end;
+
+
+// --- Obsolete Helper Functions (to be removed or integrated) ---
+
+function TForm3.ValiderDeplacement(DepartCol, DepartRow, ArriveeCol, ArriveeRow: Integer): Boolean;
+var
+  TypePiece: TPion;
+begin
+  Result := False; // Default to invalid move
+
+  // Basic checks
+  if (DepartCol = 0) or (DepartRow = 0) or (ArriveeCol = 0) or (ArriveeRow = 0) then
+  begin
+    // This should not happen if selection logic is correct
+    Exit;
+  end;
+
+  // 1. Check if destination is diagonal
+  if Abs(ArriveeCol - DepartCol) <> Abs(ArriveeRow - DepartRow) then
+  begin
+     StatusBar1.SimpleText := 'Le déplacement doit être diagonal.';
+    Exit;
+  end;
+
+  // 2. Check if destination is empty
+  if Plateau[ArriveeRow, ArriveeCol] <> Vide then
+  begin
+     StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
+    Exit;
+  end;
+
+  // 3. Specific Pawn Movement Logic (only single step for now)
+  TypePiece := Plateau[DepartRow, DepartCol];
+  if (TypePiece = J1) or (TypePiece = J2) then
+  begin
+      // Check direction for pawns
+      if (TypePiece = J1) and (ArriveeRow < DepartRow) then
+      begin
+          StatusBar1.SimpleText := 'Les pions blancs doivent se déplacer en descendant.';
+          Exit;
+      end;
+      if (TypePiece = J2) and (ArriveeRow > DepartRow) then
+      begin
+          StatusBar1.SimpleText := 'Les pions noirs doivent se déplacer en montant.';
+          Exit;
+      end;
+
+      // Check if it's a single step move
+       if Abs(ArriveeCol - DepartCol) = 1 then // Already checked ArriveeRow diff implicitly with diagonal check
+       begin
+           // Valid single step pawn move
+           Result := True;
+           StatusBar1.SimpleText := 'Déplacement validé de (' + IntToStr(DepartCol) + ', ' + IntToStr(DepartRow) + ') à (' + IntToStr(ArriveeCol) + ', ' + IntToStr(ArriveeRow) + ')';
+       end
+       // else Check for capture jump (Abs = 2) - Add later
+  end;
+
+  // 4. King Movement Logic (Add later)
+  // if (TypePiece = D1) or (TypePiece = D2) then
+  // begin
+  //   // Allow forward/backward, single/multi step, capture etc.
+  // end;
 
 end;
 
@@ -301,19 +451,19 @@ begin
   // Vérifier que le déplacement est diagonal et dans les limites du plateau
   if Abs(ArriveeCol - DepartCol) <> Abs(ArriveeRow - DepartRow) then
   begin
-    ShowMessage('Le déplacement doit être diagonal.');
+    StatusBar1.SimpleText := 'Le déplacement doit être diagonal.';
     Exit;
   end;
 
   // Vérifier que la case d'arrivée est vide
   if (Plateau[ArriveeRow, ArriveeCol] <> Vide) then
   begin
-    ShowMessage('La case d''arrivée doit être vide.');
+    StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
     Exit;
   end;
 
   // Mettre à jour le plateau
-  ShowMessage('Déplacement validé de (' + IntToStr(DepartCol) + ', ' + IntToStr(DepartRow) + ') à (' + IntToStr(ArriveeCol) + ', ' + IntToStr(ArriveeRow) + ')');
+  StatusBar1.SimpleText := 'Déplacement validé de (' + IntToStr(DepartCol) + ', ' + IntToStr(DepartRow) + ') à (' + IntToStr(ArriveeCol) + ', ' + IntToStr(ArriveeRow) + ')';
   Plateau[ArriveeRow, ArriveeCol] := Plateau[DepartRow, DepartCol];
   Plateau[DepartRow, DepartCol] := Vide;
   StringGrid1.InvalidateCell(DepartCol-1, DepartRow-1);
@@ -388,9 +538,9 @@ begin
 
   // Vérification de la victoire
   if PionsMangesJ1 = 20 then
-    ShowMessage('Joueur 1 a gagné !')
+    StatusBar1.SimpleText := 'Joueur 1 a gagné !'
   else if PionsMangesJ2 = 20 then
-    ShowMessage('Joueur 2 a gagné !');
+    StatusBar1.SimpleText := 'Joueur 2 a gagné !';
 end;
 
 procedure TForm3.MenuItem6Click(Sender: TObject);
@@ -404,4 +554,29 @@ begin
  form3.hide;
  form1.Show;
 end;
+
+procedure TForm3.VerifierFinPartie;
+begin
+  // Basic check: if one player has no pawns left
+  if PionsMangesJ2 = 10 then // Assuming 10 pawns initially for J2
+  begin
+     StatusBar1.SimpleText := 'Joueur 1 a gagné !';
+    // Optionally disable further moves: StringGrid1.Enabled := False;
+  end
+  else if PionsMangesJ1 = 10 then // Assuming 10 pawns initially for J1
+  begin
+     StatusBar1.SimpleText := 'Joueur 2 a gagné !';
+    // Optionally disable further moves: StringGrid1.Enabled := False;
+  end;
+
+  // More complex checks needed:
+  // - No legal moves for the current player (stalemate/loss)
+end;
+
+procedure TForm3.MenuItem2Click(Sender: TObject);
+begin
+  //showmessage('cette action vous feras perdre la partie en cours');
+  FormCreate(Sender);
+end;
+
 end.
