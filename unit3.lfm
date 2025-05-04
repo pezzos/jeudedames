@@ -1,17 +1,17 @@
 object Form3: TForm3
   Left = 517
-  Height = 466
-  Top = 157
+  Height = 870
+  Top = 29
   Width = 1000
   Caption = 'Form3'
-  ClientHeight = 0
-  ClientWidth = 0
+  ClientHeight = 870
+  ClientWidth = 1000
   Menu = MainMenu1
   OnCreate = FormCreate
   LCLVersion = '3.4.0.0'
   object StringGrid1: TStringGrid
-    Left = 168
-    Height = 504
+    Left = 210
+    Height = 630
     Top = 72
     Width = 504
     ColCount = 10
