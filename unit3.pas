@@ -246,7 +246,11 @@ if (aRow + aCol) mod 2 = 0 then
   // Debug: Check the value for the specific cell
   if (aCol = 9) and (aRow = 8) then
   begin
-    WriteLn('DEBUG: Drawing cell [', aCol, ',', aRow, ']. Plateau[', aRow + 1, ',', aCol + 1, '] value is: ', Ord(Plateau[aRow + 1, aCol + 1])); // Use Ord() to see the enum value as integer (Vide=0, J1=1, J2=2, etc.)
+    // Use ShowMessage for debugging in GUI context
+    ShowMessage(Format('DEBUG: Cell[Col=%d, Row=%d], Plateau[Row=%d, Col=%d] = %d', [
+      aCol, aRow, aRow + 1, aCol + 1, Ord(Plateau[aRow + 1, aCol + 1])
+    ]));
+    // WriteLn('DEBUG: Drawing cell [', aCol, ',', aRow, ']. Plateau[', aRow + 1, ',', aCol + 1, '] value is: ', Ord(Plateau[aRow + 1, aCol + 1])); // Use Ord() to see the enum value as integer (Vide=0, J1=1, J2=2, etc.)
   end;
 
   if Plateau[aRow + 1, aCol + 1] = J1 then
