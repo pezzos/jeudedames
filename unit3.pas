@@ -243,6 +243,12 @@ if (aRow + aCol) mod 2 = 0 then
     StringGrid1.Canvas.Brush.Color := clBlack;
     StringGrid1.Canvas.FillRect(aRect);
 
+  // Debug: Check the value for the specific cell
+  if (aCol = 9) and (aRow = 8) then
+  begin
+    WriteLn('DEBUG: Drawing cell [', aCol, ',', aRow, ']. Plateau[', aRow + 1, ',', aCol + 1, '] value is: ', Ord(Plateau[aRow + 1, aCol + 1])); // Use Ord() to see the enum value as integer (Vide=0, J1=1, J2=2, etc.)
+  end;
+
   if Plateau[aRow + 1, aCol + 1] = J1 then
     DessinerPion(aCol, aRow, clWhite)
   else if Plateau[aRow + 1, aCol + 1] = J2 then
