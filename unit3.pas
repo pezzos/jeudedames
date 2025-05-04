@@ -115,12 +115,12 @@ procedure TForm3.ButtonOnClick(Sender: TObject);
   // Vérifier que les cases de départ et d'arrivée ont été sélectionnées
   if (CaseDepartCol = 0) or (CaseDepartRow = 0) or (CaseArriveeCol = 0) or (CaseArriveeRow = 0) then
   begin
-    StatusBar1.SimpleText := 'Veuillez sélectionner une case de départ et une case d''arrivée.';
+    LabeledEdit4.Caption := 'Veuillez sélectionner une case de départ et une case d''arrivée.';
     Exit;
   end;
    
   // Afficher les coordonnées pour débogage
-  StatusBar1.SimpleText := 'Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
+  LabeledEdit4.Caption := 'Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
               ' à Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow);
 
   // Valider le déplacement
@@ -181,19 +181,19 @@ begin
             CaseDepartSelectionnee := True;
             // Highlight the selected square (optional, can be done in DrawCell)
             StringGrid1.InvalidateCell(CaseDepartCol, CaseDepartRow); // Force redraw for selection feedback
-             StatusBar1.SimpleText := 'Case départ : Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow);
+            LabeledEdit4.Caption := 'Case départ : Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow);
         end
         else
         begin
             // Invalid selection: wrong player's piece or empty square
-             StatusBar1.SimpleText := 'La case de départ doit contenir un pion du joueur actuel.';
+            LabeledEdit4.Caption := 'La case de départ doit contenir un pion du joueur actuel.';
             Exit;
         end;
     end
     else
     begin
         // Invalid selection: white square
-         StatusBar1.SimpleText := 'Vous ne pouvez cliquer que sur les cases noires.';
+        LabeledEdit4.Caption := 'Vous ne pouvez cliquer que sur les cases noires.';
         Exit;
     end;
 
@@ -223,17 +223,17 @@ begin
                 // 3. Is the move direction correct for the pawn?
                 if (PieceType = J1) and (CaseArriveeRow < CaseDepartRow) then
                 begin
-                     StatusBar1.SimpleText := 'Les pions blancs (J1) doivent se déplacer en descendant.';
+                    LabeledEdit4.Caption := 'Les pions blancs (J1) doivent se déplacer en descendant.';
                     Exit; // Invalid move
                 end;
                 if (PieceType = J2) and (CaseArriveeRow > CaseDepartRow) then
                 begin
-                     StatusBar1.SimpleText := 'Les pions noirs (J2) doivent se déplacer en montant.';
+                    LabeledEdit4.Caption := 'Les pions noirs (J2) doivent se déplacer en montant.';
                     Exit; // Invalid move
                 end;
 
                 // --- Valid Pawn Move ---
-                 StatusBar1.SimpleText := 'Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
+                LabeledEdit4.Caption := 'Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
                                        ' vers Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow);
                 // Update logical board
                 Plateau[CaseArriveeRow, CaseArriveeCol] := PieceType;
@@ -252,7 +252,7 @@ begin
             begin
                 // --- Not a simple pawn move, check other possibilities (capture, king move?) ---
                 // For now, just consider it invalid if not a single diagonal step
-                 StatusBar1.SimpleText := 'Mouvement non valide (pour l''instant).'; // Placeholder message
+                LabeledEdit4.Caption := 'Mouvement non valide (pour l''instant).'; // Placeholder message
                 // Keep selection active to allow choosing a different destination
                 CaseArriveeCol := 0; CaseArriveeRow := 0;
             end;
@@ -260,7 +260,7 @@ begin
         else
         begin
              // Destination square is not empty
-             StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
+             LabeledEdit4.Caption := 'La case d''arrivée doit être vide.';
              // Allow user to select a different destination
              CaseArriveeCol := 0; CaseArriveeRow := 0;
         end;
@@ -268,7 +268,7 @@ begin
     else
     begin
         // Invalid destination: white square
-         StatusBar1.SimpleText := 'Vous ne pouvez cliquer que sur les cases noires pour la destination.';
+        LabeledEdit4.Caption := 'Vous ne pouvez cliquer que sur les cases noires pour la destination.';
         // Allow user to select a different destination
         CaseArriveeCol := 0; CaseArriveeRow := 0;
     end;
@@ -295,14 +295,14 @@ begin
   // 1. Check if destination is diagonal
   if Abs(ArriveeCol - DepartCol) <> Abs(ArriveeRow - DepartRow) then
   begin
-     StatusBar1.SimpleText := 'Le déplacement doit être diagonal.';
+    LabeledEdit4.Caption := 'Le déplacement doit être diagonal.';
     Exit;
   end;
 
   // 2. Check if destination is empty
   if Plateau[ArriveeRow, ArriveeCol] <> Vide then
   begin
-     StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
+    LabeledEdit4.Caption := 'La case d''arrivée doit être vide.';
     Exit;
   end;
 
@@ -313,12 +313,12 @@ begin
       // Check direction for pawns
       if (TypePiece = J1) and (ArriveeRow < DepartRow) then
       begin
-          StatusBar1.SimpleText := 'Les pions blancs doivent se déplacer en descendant.';
+          LabeledEdit4.Caption := 'Les pions blancs doivent se déplacer en descendant.';
           Exit;
       end;
       if (TypePiece = J2) and (ArriveeRow > DepartRow) then
       begin
-          StatusBar1.SimpleText := 'Les pions noirs doivent se déplacer en montant.';
+          LabeledEdit4.Caption := 'Les pions noirs doivent se déplacer en montant.';
           Exit;
       end;
 
@@ -327,7 +327,7 @@ begin
        begin
            // Valid single step pawn move
            Result := True;
-           StatusBar1.SimpleText := 'Déplacement validé de (' + IntToStr(DepartCol) + ', ' + IntToStr(DepartRow) + ') à (' + IntToStr(ArriveeCol) + ', ' + IntToStr(ArriveeRow) + ')';
+           LabeledEdit4.Caption := 'Déplacement validé de (' + IntToStr(DepartCol) + ', ' + IntToStr(DepartRow) + ') à (' + IntToStr(ArriveeCol) + ', ' + IntToStr(ArriveeRow) + ')';
        end
        // else Check for capture jump (Abs = 2) - Add later
   end;
@@ -455,9 +455,9 @@ begin
 
   // Vérification de la victoire
   if PionsMangesJ1 = 20 then
-    StatusBar1.SimpleText := 'Joueur 1 a gagné !'
+    LabeledEdit4.Caption := 'Joueur 1 a gagné !'
   else if PionsMangesJ2 = 20 then
-    StatusBar1.SimpleText := 'Joueur 2 a gagné !';
+    LabeledEdit4.Caption := 'Joueur 2 a gagné !';
 end;
 
 procedure TForm3.MenuItem6Click(Sender: TObject);
@@ -477,12 +477,12 @@ begin
   // Basic check: if one player has no pawns left
   if PionsMangesJ2 = 10 then // Assuming 10 pawns initially for J2
   begin
-     StatusBar1.SimpleText := 'Joueur 1 a gagné !';
+    LabeledEdit4.Caption := 'Joueur 1 a gagné !';
     // Optionally disable further moves: StringGrid1.Enabled := False;
   end
   else if PionsMangesJ1 = 10 then // Assuming 10 pawns initially for J1
   begin
-     StatusBar1.SimpleText := 'Joueur 2 a gagné !';
+    LabeledEdit4.Caption := 'Joueur 2 a gagné !';
     // Optionally disable further moves: StringGrid1.Enabled := False;
   end;
 
