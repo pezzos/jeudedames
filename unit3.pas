@@ -68,10 +68,6 @@ for i := 1 to 10 do
     for j := 1 to 10 do
     begin
       Plateau[i, j] := Vide; // Use direct 1-based indices
-      if (i + j) mod 2 = 0 then
-        StringGrid1.Cells[j - 1, i - 1] := 'B' // StringGrid is 0-based
-      else
-        StringGrid1.Cells[j - 1, i - 1] := 'N';
     end;
 
 
