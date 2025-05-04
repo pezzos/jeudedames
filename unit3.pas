@@ -47,7 +47,7 @@ type
 var
   Form3: TForm3;
   CaseDepartSelectionnee :boolean;
-  Plateau: array[1..10, 1..10] of TPion;
+  Plateau: array[0..9,0..9] of TPion;
   PionsMangesJ1,PionsMangesJ2,CaseDepartCol,CaseDepartRow,CaseArriveeCol,CaseArriveeRow,Tour:integer;
   //Nombretour:integer;
 implementation
@@ -62,34 +62,33 @@ var i,j:integer;
 // Initialisation du damier
   StringGrid1.RowCount := 10;
   StringGrid1.ColCount := 10;
-
 // Initialisation du plateau et des cases
-for i := 1 to 10 do
-    for j := 1 to 10 do
+for i := 0 to 9 do
+    for j := 0 to 9 do 
     begin
-      Plateau[i, j] := Vide; // Use direct 1-based indices
+      Plateau[i + 1, j + 1] := Vide; // Initialisation des cases vides
+      if (i + j) mod 2 = 0 then
+        StringGrid1.Cells[j, i] := 'B'  // Case blanche
+      else
+        StringGrid1.Cells[j, i] := 'N'; // Case noire
     end;
 
 
-  // Placement des pions (adjust loops and condition)
-  // J1 on rows 1-4
+  // Placement des pions
   for i := 0 to 3 do
     for j := 0 to 9 do
-      // Place on black squares: (i+j) mod 2 = 1 (odd)
       if (i + j) mod 2 = 1 then
         begin
          // DessinerPion(j, i, clWhite); // Remove redundant drawing call
-         Plateau[i, j] := J1; // Use direct 1-based indices
+         Plateau[i + 1, j + 1] := J1;
         end;
 
-  // J2 on rows 7-10
   for i := 6 to 9 do
     for j := 0 to 9 do
-      // Place on black squares: (i+j) mod 2 = 1 (odd)
       if (i + j) mod 2 = 1 then
         begin
          // DessinerPion(j, i, clGray); // Remove redundant drawing call
-         Plateau[i, j] := J2; // Use direct 1-based indices
+         Plateau[i + 1, j + 1] := J2;
         end;
 
 
@@ -244,13 +243,13 @@ if (aRow + aCol) mod 2 = 0 then
     StringGrid1.Canvas.Brush.Color := clBlack;
     StringGrid1.Canvas.FillRect(aRect);
 
-  if Plateau[aRow, aCol] = J1 then
+  if Plateau[aRow + 1, aCol + 1] = J1 then
     DessinerPion(aCol, aRow, clWhite)
-  else if Plateau[aRow, aCol] = J2 then
+  else if Plateau[aRow + 1, aCol + 1] = J2 then
     DessinerPion(aCol, aRow, clGray)
-  else if Plateau[aRow, aCol] = D1 then
+  else if Plateau[aRow + 1, aCol + 1] = D1 then
     DessinerPion(aCol, aRow, clWhite)
-  else if Plateau[aRow, aCol] = D2 then
+  else if Plateau[aRow + 1, aCol + 1] = D2 then
     DessinerPion(aCol, aRow, clGray);
  // Surligner la case départ
 if (aCol = CaseDepartCol-1) and (aRow = CaseDepartRow-1) then
@@ -283,13 +282,13 @@ begin
   StringGrid1.Canvas.Brush.Color := Couleur;
   StringGrid1.Canvas.FillRect(StringGrid1.CellRect(Col, Row));
 
-if Plateau[Row, Col] = J1 then
+if Plateau[Row + 1, Col + 1] = J1 then
     DessinerPion(Col, Row, clWhite)
-  else if Plateau[Row, Col] = J2 then
+  else if Plateau[Row + 1, Col + 1] = J2 then
     DessinerPion(Col, Row, clGray)
-  else if Plateau[Row, Col] = D1 then
+  else if Plateau[Row + 1, Col + 1] = D1 then
     DessinerPion(Col, Row, clWhite)
-  else if Plateau[Row, Col] = D2 then
+  else if Plateau[Row + 1, Col + 1] = D2 then
     DessinerPion(Col, Row, clGray);
 
 end;
@@ -355,12 +354,12 @@ end;
 procedure TForm3.VerifierPromotion(ArriveeCol, ArriveeRow: Integer);
 begin
   // Vérifier si un pion atteint le bord du plateau pour devenir une dame
-  if (ArriveeRow = 1) and (Plateau[ArriveeRow, ArriveeCol] = J1) then
+  if (ArriveeRow = 0) and (Plateau[ArriveeRow, ArriveeCol] = J1) then
   begin
     Plateau[ArriveeRow, ArriveeCol] := D1;
     DessinerPion(ArriveeCol, ArriveeRow, clWhite);
   end
-  else if (ArriveeRow = 10) and (Plateau[ArriveeRow, ArriveeCol] = J2) then
+  else if (ArriveeRow = 9) and (Plateau[ArriveeRow, ArriveeCol] = J2) then
   begin
     Plateau[ArriveeRow, ArriveeCol] := D2;
     DessinerPion(ArriveeCol, ArriveeRow, clGray);
