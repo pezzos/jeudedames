@@ -79,7 +79,7 @@ for i := 0 to 9 do
     for j := 0 to 9 do
       if (i + j) mod 2 = 1 then
         begin
-         DessinerPion(j, i, clWhite); // Pion blanc
+         // DessinerPion(j, i, clWhite); // Remove redundant drawing call
          Plateau[i + 1, j + 1] := J1;
         end;
 
@@ -87,7 +87,7 @@ for i := 0 to 9 do
     for j := 0 to 9 do
       if (i + j) mod 2 = 1 then
         begin
-         DessinerPion(j, i, clGray); // Pion gris
+         // DessinerPion(j, i, clGray); // Remove redundant drawing call
          Plateau[i + 1, j + 1] := J2;
         end;
 
@@ -102,6 +102,8 @@ for i := 0 to 9 do
 
   CaseDepartSelectionnee:=false;
 
+  // Force redraw of the grid after initialization
+  StringGrid1.Invalidate;
   end;
 procedure TForm3.ButtonOnClick(Sender: TObject);
   begin
