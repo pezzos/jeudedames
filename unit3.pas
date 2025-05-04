@@ -196,6 +196,7 @@ procedure TForm3.ButtonOnClick(Sender: TObject);
 procedure TForm3.StringGrid1Click(Sender: TObject);
 var
   ClickedCol, ClickedRow: Integer; // 0-based grid coordinates
+  PieceType: TPion; // Declaration added here
 begin
   // Get the 0-based column and row index of the clicked cell
   ClickedCol := StringGrid1.Col;
@@ -329,7 +330,7 @@ begin
 
     // --- TEMPORARY: Assume move is valid for now and update board state ---
     // Get piece type from start position
-    val PieceType : TPion := Plateau[CaseDepartRow, CaseDepartCol];
+    PieceType := Plateau[CaseDepartRow, CaseDepartCol]; // Assignment without declaration
 
     // Move piece in the logical board
     Plateau[CaseArriveeRow, CaseArriveeCol] := PieceType;
@@ -338,7 +339,7 @@ begin
     // --- Check for simple promotion (reaching the end row) ---
     // NOTE: Does not handle Kings moving back!
     if (PieceType = J1) and (CaseArriveeRow = 10) then // J1 reaches row 10 (index 9 in 0-based)
-      Plateau[CaseArriveeRow, CaseArriveeCol] := D1; // Promote to King
+      Plateau[CaseArriveeRow, CaseArriveeCol] := D1 // Promote to King
     else if (PieceType = J2) and (CaseArriveeRow = 1) then // J2 reaches row 1 (index 0 in 0-based)
        Plateau[CaseArriveeRow, CaseArriveeCol] := D2; // Promote to King
 
