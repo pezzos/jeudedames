@@ -15,13 +15,17 @@ This list breaks down the TODOs into smaller, actionable steps, prioritized by i
 2.  **Task: Verify/Fix Initial J2 Pawn Placement**
     *   **Goal:** Ensure all black pawns are correctly placed at the start.
     *   **Steps:**
-        *   **Re-Analysis:** The user reports the missing pawn is at `Plateau[9,10]` (1-based: row 9, col 10). Initial code analysis indicates the loop logic `for i := 6 to 9... if (i+j) mod 2 = 1 then Plateau[i+1, j+1] := J2` *should* correctly place this pawn (when `i=8, j=9`). The previous fix targeting `Plateau[10,1]` was based on faulty modulo calculation analysis and should be reverted.
-        *   **Hypothesis:** The visually missing pawn is likely due to rendering issues. The `FormCreate` procedure contains redundant calls to `DessinerPion` and, more importantly, **lacks a final `StringGrid1.Invalidate;` call**. This means the grid might not redraw correctly after initialization, potentially hiding the pawn at [9,10].
-        *   **Fix Plan:**
-            1.  Remove the redundant `DessinerPion(j, i, ...)` calls from within the J1 and J2 placement loops in `FormCreate`.
-            2.  Add `StringGrid1.Invalidate;` at the very end of the `FormCreate` procedure.
-            3.  Ensure the previous incorrect fix (`Plateau[10, 1] := J2;`) is removed if present.
-        *   **Verification:** Run the application and visually confirm that a black pawn (J2) is present in the cell corresponding to `Plateau[9,10]` (Grid: Col 9, Row 8).
+        *   **Re-Analysis & Debug:** User confirmed `ShowMessage` debug output shows `Plateau[9,10]` (1-based) is `0` (Vide) at draw time, despite initialization logic seeming correct for `J2` (value 2). This strongly suggests the previous mixed 0-based/1-based indexing caused an issue (e.g., silent out-of-bounds write/read).
+        *   **Fix Approach:** Implement consistent 1-based indexing for the `Plateau` array, starting with the declaration and initialization logic, as a targeted fix for this task (anticipating Task 7).
+        *   **Implementation Steps:**
+            1.  Change `Plateau` declaration to `array[1..10, 1..10] of TPion`.
+            2.  Modify loops in `FormCreate` to iterate from 1 to 10 (or appropriate sub-ranges for J1/J2).
+            3.  Access `Plateau` directly using `[i, j]` within these loops.
+            4.  Verify placement condition `(i + j) mod 2 = 1` for black squares (assuming 1,1 is white).
+            5.  Adjust `StringGrid.Cells` access to `[j - 1, i - 1]` as the grid remains 0-based.
+            6.  Keep access in `StringGrid1DrawCell` as `Plateau[aRow + 1, aCol + 1]` to map 0-based grid coords to 1-based board coords.
+            7.  Ensure previous debug code and incorrect fixes are removed.
+        *   **Verification:** Run the application and visually confirm the pawn at `Plateau[9,10]` (Grid: Col 9, Row 8) displays correctly.
     *   **Impacted Files:** `Unit3.pas`
 
 3.  **Task: Implement Basic Pawn Movement Logic in `StringGrid1Click`**
