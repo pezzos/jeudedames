@@ -1,13 +1,13 @@
 object Form2: TForm2
-  Left = -786
+  Left = 1234
   Height = 349
-  Top = 42
+  Top = 326
   Width = 320
   Caption = 'Form2'
-  ClientHeight = 349
-  ClientWidth = 320
+  ClientHeight = 0
+  ClientWidth = 0
   OnClose = FormClose
-  LCLVersion = '3.8.0.0'
+  LCLVersion = '3.4.0.0'
   object Memo1: TMemo
     Left = 0
     Height = 349
