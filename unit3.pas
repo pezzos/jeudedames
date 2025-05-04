@@ -252,10 +252,9 @@ begin
             begin
                 // --- Not a simple pawn move, check other possibilities (capture, king move?) ---
                 // For now, just consider it invalid if not a single diagonal step
-                 StatusBar1.SimpleText := 'Mouvement non valide (pour l'instant).'; // Placeholder message
+                 StatusBar1.SimpleText := 'Mouvement non valide (pour l''instant).'; // Placeholder message
                 // Keep selection active to allow choosing a different destination
                 CaseArriveeCol := 0; CaseArriveeRow := 0;
-                 Exit;
             end;
         end
         else
@@ -264,7 +263,6 @@ begin
              StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
              // Allow user to select a different destination
              CaseArriveeCol := 0; CaseArriveeRow := 0;
-             Exit;
         end;
     end
     else
@@ -273,55 +271,10 @@ begin
          StatusBar1.SimpleText := 'Vous ne pouvez cliquer que sur les cases noires pour la destination.';
         // Allow user to select a different destination
         CaseArriveeCol := 0; CaseArriveeRow := 0;
-        Exit;
     end;
   end;
 end;
 
-
-// --- Obsolete Button Handler ---
-procedure TForm3.Button1Click(Sender: TObject);
-begin
- // This handler is no longer needed as moves happen directly on the second click.
- // We keep it here temporarily but will remove it (Task 1).
- // if (CaseDepartRow = 0) or (CaseDepartCol = 0) or (CaseArriveeRow = 0) or (CaseArriveeCol = 0) then
- // begin
- //   ShowMessage('Veuillez sélectionner une case de départ et une case d''arrivée.');
- //   Exit;
- // end;
-
- // ShowMessage('Déplacement de Col=' + IntToStr(CaseDepartCol) + ', Row=' + IntToStr(CaseDepartRow) +
- //   ' vers Col=' + IntToStr(CaseArriveeCol) + ', Row=' + IntToStr(CaseArriveeRow) + ' (Validation via bouton)');
-
- // Call the old validation logic (to be replaced/integrated into StringGrid1Click)
- // if ValiderDeplacement(CaseDepartCol, CaseDepartRow, CaseArriveeCol, CaseArriveeRow) then
- // begin
- //   // Move the piece on the logical board
- //   Plateau[CaseArriveeRow, CaseArriveeCol] := Plateau[CaseDepartRow, CaseDepartCol];
- //   Plateau[CaseDepartRow, CaseDepartCol] := Vide;
-
- //   // Check and handle capture (to be integrated/refined)
- //   // VerifierCapture(CaseDepartCol, CaseDepartRow, CaseArriveeCol, CaseArriveeRow);
-
- //   // Check and handle promotion (to be integrated/refined)
- //   // VerifierPromotion(CaseArriveeCol, CaseArriveeRow);
-
- //   // End Turn
- //   Tour := Tour + 1;
- //   LabeledEdit1.Text := IntToStr(Tour);
-
- //   // Reset selection for next turn
- //   CaseDepartSelectionnee := False;
- //   CaseDepartCol := 0;
- //   CaseDepartRow := 0;
- //   CaseArriveeCol := 0;
- //   CaseArriveeRow := 0;
-
- //   // Redraw the grid
- //   StringGrid1.Invalidate;
- // end;
- // // No else needed here, ValiderDeplacement already showed messages
-end;
 
 
 // --- Obsolete Helper Functions (to be removed or integrated) ---
@@ -535,13 +488,6 @@ begin
 
   // More complex checks needed:
   // - No legal moves for the current player (stalemate/loss)
-end;
-
-procedure TForm3.MenuItem2Click(Sender: TObject);
-begin
-  //showmessage('cette action vous feras perdre la partie en cours');
-  // Call FormCreate using Self
-  Self.FormCreate(Sender);
 end;
 
 end.
