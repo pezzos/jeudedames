@@ -1,0 +1,120 @@
+object Form3: TForm3
+  Left = -836
+  Height = 717
+  Top = 560
+  Width = 1000
+  Caption = 'Form3'
+  ClientHeight = 717
+  ClientWidth = 1000
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  LCLVersion = '3.8.0.0'
+  object StringGrid1: TStringGrid
+    Left = 168
+    Height = 504
+    Top = 72
+    Width = 504
+    ColCount = 10
+    DefaultColWidth = 50
+    DefaultRowHeight = 50
+    FixedCols = 0
+    FixedRows = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goSmoothScroll]
+    RowCount = 10
+    ScrollBars = ssNone
+    TabOrder = 0
+    OnClick = StringGrid1Click
+    OnDrawCell = StringGrid1DrawCell
+  end
+  object Button1: TButton
+    Left = 694
+    Height = 25
+    Top = 304
+    Width = 82
+    Caption = 'Confirmer'
+    TabOrder = 1
+  end
+  object RadioButton1: TRadioButton
+    Left = 376
+    Height = 18
+    Top = 40
+    Width = 39
+    Caption = 'J1'
+    TabOrder = 2
+  end
+  object RadioButton2: TRadioButton
+    Left = 376
+    Height = 18
+    Top = 600
+    Width = 40
+    Caption = 'J2'
+    TabOrder = 3
+  end
+  object LabeledEdit1: TLabeledEdit
+    Left = 695
+    Height = 21
+    Top = 265
+    Width = 80
+    EditLabel.Height = 16
+    EditLabel.Width = 80
+    EditLabel.Caption = 'Tour numéro :'
+    TabOrder = 4
+  end
+  object LabeledEdit2: TLabeledEdit
+    Left = 432
+    Height = 21
+    Top = 43
+    Width = 80
+    EditLabel.Height = 16
+    EditLabel.Width = 80
+    EditLabel.Caption = 'Pions mangés :'
+    TabOrder = 5
+  end
+  object LabeledEdit3: TLabeledEdit
+    Left = 432
+    Height = 21
+    Top = 608
+    Width = 80
+    EditLabel.Height = 16
+    EditLabel.Width = 80
+    EditLabel.Caption = 'Pions mangés :'
+    TabOrder = 6
+  end
+  object LabeledEdit4: TLabeledEdit
+    Left = 694
+    Height = 21
+    Top = 208
+    Width = 280
+    EditLabel.Height = 16
+    EditLabel.Width = 280
+    EditLabel.Caption = 'Instructions de partie :'
+    TabOrder = 7
+  end
+  object MainMenu1: TMainMenu
+    Left = 19
+    Top = 16
+    object MenuItem1: TMenuItem
+      Caption = 'Options de partie'
+      object MenuItem3: TMenuItem
+        Caption = 'Nouvelle partie'
+      end
+      object MenuItem4: TMenuItem
+        Caption = 'Charger partie'
+      end
+      object MenuItem5: TMenuItem
+        Caption = 'Enregistrer partie'
+      end
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'Paramètres'
+      object MenuItem6: TMenuItem
+        Caption = 'Règles'
+        OnClick = MenuItem6Click
+      end
+      object MenuItem7: TMenuItem
+        Caption = 'Retour menu'
+        OnClick = MenuItem7Click
+      end
+    end
+  end
+end
