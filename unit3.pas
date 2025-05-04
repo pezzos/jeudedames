@@ -63,6 +63,7 @@ var i,j:integer;
   StringGrid1.RowCount := 10;
   StringGrid1.ColCount := 10;
 
+// Initialisation du plateau et des cases
 for i := 1 to 10 do
     for j := 1 to 10 do
     begin
@@ -76,8 +77,8 @@ for i := 1 to 10 do
 
   // Placement des pions (adjust loops and condition)
   // J1 on rows 1-4
-  for i := 1 to 4 do
-    for j := 1 to 10 do
+  for i := 0 to 3 do
+    for j := 0 to 9 do
       // Place on black squares: (i+j) mod 2 = 1 (odd)
       if (i + j) mod 2 = 1 then
         begin
@@ -86,8 +87,8 @@ for i := 1 to 10 do
         end;
 
   // J2 on rows 7-10
-  for i := 7 to 10 do
-    for j := 1 to 10 do
+  for i := 6 to 9 do
+    for j := 0 to 9 do
       // Place on black squares: (i+j) mod 2 = 1 (odd)
       if (i + j) mod 2 = 1 then
         begin
