@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Grids, StdCtrls,
-  ExtCtrls, Menus, Types;
+  ExtCtrls, Menus, Types, ComCtrls;
 
 type
   TPion = (Vide,J1,J2,D1,D2);
@@ -28,6 +28,7 @@ type
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     StringGrid1: TStringGrid;
+    StatusBar1: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
@@ -38,7 +39,7 @@ type
   private
     procedure DessinerPion(Col, Row:integer; Couleur:TColor);
     procedure SurlignerCase(Col, Row:integer; Couleur:TColor);
-    procedure ValiderDeplacement(DepartCol,DepartRow,ArriveeCol,ArriveeRow:integer);
+    function ValiderDeplacement(DepartCol,DepartRow,ArriveeCol,ArriveeRow:integer): Boolean;
     procedure VerifierCapture(DepartCol,DepartRow,ArriveeCol,ArriveeRow:integer);
     procedure VerifierPromotion(ArriveeCol,ArriveeRow:integer);
     procedure FinDuTour;
@@ -445,43 +446,6 @@ if Plateau[Row + 1, Col + 1] = J1 then
 
 end;
 
-
-procedure TForm3.ValiderDeplacement(DepartCol, DepartRow, ArriveeCol, ArriveeRow: Integer);
-begin
-  // Vérifier que le déplacement est diagonal et dans les limites du plateau
-  if Abs(ArriveeCol - DepartCol) <> Abs(ArriveeRow - DepartRow) then
-  begin
-    StatusBar1.SimpleText := 'Le déplacement doit être diagonal.';
-    Exit;
-  end;
-
-  // Vérifier que la case d'arrivée est vide
-  if (Plateau[ArriveeRow, ArriveeCol] <> Vide) then
-  begin
-    StatusBar1.SimpleText := 'La case d''arrivée doit être vide.';
-    Exit;
-  end;
-
-  // Mettre à jour le plateau
-  StatusBar1.SimpleText := 'Déplacement validé de (' + IntToStr(DepartCol) + ', ' + IntToStr(DepartRow) + ') à (' + IntToStr(ArriveeCol) + ', ' + IntToStr(ArriveeRow) + ')';
-  Plateau[ArriveeRow, ArriveeCol] := Plateau[DepartRow, DepartCol];
-  Plateau[DepartRow, DepartCol] := Vide;
-  StringGrid1.InvalidateCell(DepartCol-1, DepartRow-1);
-  StringGrid1.InvalidateCell(ArriveeCol-1, ArriveeRow-1);
-
-  //StringGrid1.Canvas.FillRect(StringGrid1.CellRect(DepartCol-1, DepartRow-1));
-  // Dessiner le pion à la nouvelle position
-  {if (Plateau[ArriveeRow,ArriveeCol] =J1) or (Plateau[ArriveeRow,ArriveeCol] =D1) then
-     begin
-     DessinerPion(ArriveeCol-1, ArriveeRow-1, clWhite);
-     end
-     else if (Plateau[ArriveeRow,ArriveeRow]=J2) or (Plateau[ArriveeRow,ArriveeCol] =D2) then
-       begin
-             DessinerPion(ArriveeCol-1,ArriveeRow-1,clGray);
-       end; }
-
-end;
-
 procedure TForm3.VerifierCapture(DepartCol, DepartRow, ArriveeCol, ArriveeRow: Integer);
 var
   CapturedCol, CapturedRow: Integer;
@@ -576,7 +540,8 @@ end;
 procedure TForm3.MenuItem2Click(Sender: TObject);
 begin
   //showmessage('cette action vous feras perdre la partie en cours');
-  FormCreate(Sender);
+  // Call FormCreate using Self
+  Self.FormCreate(Sender);
 end;
 
 end.
